@@ -21,6 +21,38 @@
   const TM_BELLS = [{ id: "ding", name: "딩동" }, { id: "bell", name: "종" }, { id: "beep", name: "삐삐" }, { id: "chime", name: "차임" }];
   let cheerT = null;
   const CHEERS = ["화이팅! 💪", "조금만 더! 🔥", "집중 집중! 📚", "거의 다 왔어! ✨", "오늘도 화이팅! ⭐", "잘하고 있어! 🐰", "포기 없기! 💫"];
+  // 응원 동물 6종 (같은 하얀 머리띠 · 같은 포즈 · 빨간 점 없음)
+  const ANIMALS = [
+    { body: "#ffffff", line: "#e7cdd8", nose: "#e02e78",   // 토끼
+      back: '<ellipse cx="24" cy="22" rx="6.5" ry="17" fill="#fff" stroke="#e7cdd8" stroke-width="1.6" transform="rotate(-11 24 22)"/><ellipse cx="40" cy="22" rx="6.5" ry="17" fill="#fff" stroke="#e7cdd8" stroke-width="1.6" transform="rotate(11 40 22)"/><ellipse cx="24" cy="23" rx="2.6" ry="10" fill="#ffc3d5" transform="rotate(-11 24 23)"/><ellipse cx="40" cy="23" rx="2.6" ry="10" fill="#ffc3d5" transform="rotate(11 40 23)"/>' },
+    { body: "#b98a5a", line: "#916a3f", nose: "#5a3f28",   // 곰
+      back: '<circle cx="17" cy="35" r="8" fill="#b98a5a" stroke="#916a3f" stroke-width="1.6"/><circle cx="47" cy="35" r="8" fill="#b98a5a" stroke="#916a3f" stroke-width="1.6"/><circle cx="17" cy="35" r="3.6" fill="#8a6038"/><circle cx="47" cy="35" r="3.6" fill="#8a6038"/>',
+      extra: '<ellipse cx="32" cy="58" rx="9" ry="6.5" fill="#e8d1aa"/>' },
+    { body: "#f0954a", line: "#d2762f", nose: "#3a2b2b",   // 여우
+      back: '<path d="M13 41 L19 19 L29 37 Z" fill="#f0954a" stroke="#d2762f" stroke-width="1.6"/><path d="M51 41 L45 19 L35 37 Z" fill="#f0954a" stroke="#d2762f" stroke-width="1.6"/><path d="M17.5 37 L20 25 L25 35 Z" fill="#3a2b2b"/><path d="M46.5 37 L44 25 L39 35 Z" fill="#3a2b2b"/>',
+      extra: '<ellipse cx="32" cy="59" rx="11" ry="7" fill="#fff"/>' },
+    { body: "#f4a24a", line: "#cf7f2a", nose: "#3a2b2b",   // 호랑이
+      back: '<circle cx="18" cy="36" r="7" fill="#f4a24a" stroke="#cf7f2a" stroke-width="1.6"/><circle cx="46" cy="36" r="7" fill="#f4a24a" stroke="#cf7f2a" stroke-width="1.6"/><circle cx="18" cy="36" r="3" fill="#3a2b2b"/><circle cx="46" cy="36" r="3" fill="#3a2b2b"/>',
+      extra: '<ellipse cx="32" cy="59" rx="10" ry="6.5" fill="#fff"/><path d="M14 51 l6 1.5 M14 56 l6 0.5 M50 51 l-6 1.5 M50 56 l-6 0.5" stroke="#3a2b2b" stroke-width="1.6" stroke-linecap="round" fill="none"/>' },
+    { body: "#f0d9a8", line: "#d4b57a", nose: "#c08a6a",   // 햄스터
+      back: '<circle cx="20" cy="37" r="5.5" fill="#f0d9a8" stroke="#d4b57a" stroke-width="1.5"/><circle cx="44" cy="37" r="5.5" fill="#f0d9a8" stroke="#d4b57a" stroke-width="1.5"/><circle cx="20" cy="37" r="2.4" fill="#e6b8c0"/><circle cx="44" cy="37" r="2.4" fill="#e6b8c0"/>',
+      extra: '<circle cx="16" cy="58" r="6" fill="#f0d9a8" stroke="#d4b57a" stroke-width="1.4"/><circle cx="48" cy="58" r="6" fill="#f0d9a8" stroke="#d4b57a" stroke-width="1.4"/><ellipse cx="32" cy="58" rx="7" ry="5" fill="#fff"/>' },
+    { body: "#86cf6e", line: "#5aa84a", nose: "#3f7a30",   // 거북이 (등껍질 모자)
+      back: '<path d="M12 44 Q32 15 52 44 Z" fill="#e3a95f" stroke="#bb833e" stroke-width="1.8"/><path d="M32 18 V40 M20 24 L15 41 M44 24 L49 41" stroke="#bb833e" stroke-width="1.1" fill="none" opacity="0.55"/>' },
+  ];
+  function animalSVG(a) {
+    const band = '<path d="M50 43 l9 -4 M50 43 l8 5" stroke="#e6e6ee" stroke-width="3" stroke-linecap="round" fill="none"/>' +
+      '<rect x="11" y="40" width="42" height="6.5" rx="3.2" fill="#fbfbff" stroke="#d3d3dd" stroke-width="1"/>';
+    const face = '<circle cx="24.5" cy="52" r="2.6" fill="#2f2320"/><circle cx="39.5" cy="52" r="2.6" fill="#2f2320"/>' +
+      '<circle cx="25.4" cy="51.2" r="0.8" fill="#fff"/><circle cx="40.4" cy="51.2" r="0.8" fill="#fff"/>' +
+      '<circle cx="18.5" cy="57" r="3" fill="#ffb0c4" opacity="0.85"/><circle cx="45.5" cy="57" r="3" fill="#ffb0c4" opacity="0.85"/>' +
+      '<circle cx="32" cy="56" r="1.6" fill="' + (a.nose || "#7a5a4a") + '"/>' +
+      '<path d="M32 57.5 q-2.5 2.2 -5 0.6 M32 57.5 q2.5 2.2 5 0.6" stroke="#a88" stroke-width="1.2" fill="none"/>';
+    const paw = '<circle cx="13" cy="46" r="5" fill="' + (a.paw || a.body) + '" stroke="' + a.line + '" stroke-width="1.4"/>';
+    return '<svg viewBox="0 0 64 74" class="tm-rabbit-svg" xmlns="http://www.w3.org/2000/svg"><g class="tmr-wiggle">' +
+      (a.back || "") + '<ellipse cx="32" cy="50" rx="20" ry="19" fill="' + a.body + '" stroke="' + a.line + '" stroke-width="1.6"/>' +
+      (a.extra || "") + band + face + paw + "</g></svg>";
+  }
 
   // ============================================================
   //  창 열고 닫기
@@ -253,8 +285,9 @@
   function openTimer() { initTimer(); renderStudyRecords(); }
   // 응원 토끼 튀어나오기
   function cheerRabbit() {
-    const r = document.getElementById("tm-rabbit"), b = document.getElementById("tm-rabbit-bubble");
+    const r = document.getElementById("tm-rabbit"), b = document.getElementById("tm-rabbit-bubble"), holder = document.getElementById("tm-animal");
     if (!r) return;
+    holder.innerHTML = animalSVG(ANIMALS[(Math.random() * ANIMALS.length) | 0]);   // 랜덤 동물
     b.textContent = CHEERS[(Math.random() * CHEERS.length) | 0];
     r.classList.remove("show"); void r.offsetWidth; r.classList.add("show");
     window.Audio2.ensure(); window.Audio2.blip(920); window.Audio2.blip(1150);   // 뾰롱 귀여운 소리
