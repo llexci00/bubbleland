@@ -6688,6 +6688,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   //  화면 전환
   // ============================================================
   function showScreen(name) {
+    if (curScreen === "computer" && name !== "computer" && window.Computer && window.Computer.leave) window.Computer.leave();   // 컴퓨터 떠날 때 타이머 정지
     document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("active", s.id === "screen-" + name));
     curScreen = name;
     const isHouse = HOUSE.includes(name);
