@@ -687,6 +687,10 @@ html, body { width: 100%; height: 100%; overflow: hidden;
 #paint-canvas { width: 100%; height: auto; display: block; background: #fffdf8; border: 2px solid #cfc9b4;
   border-radius: 8px; cursor: crosshair; touch-action: none; image-rendering: auto; box-shadow: inset 0 1px 4px rgba(0,0,0,0.08); }
 
+/* 타이머·설정 창 — 좀 더 반투명(유리) */
+#win-timer, #win-settings { background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(220,238,251,0.5));
+  backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); }
+
 /* 타이머 */
 .timer-body { display: flex; flex-direction: column; gap: 10px; }
 .timer-tabs { display: flex; gap: 6px; }
@@ -704,9 +708,10 @@ html, body { width: 100%; height: 100%; overflow: hidden;
 .tm-btn:active { transform: translateY(1px); }
 .tm-hint { font-size: calc(11px * var(--font-scale)); color: #8a93a0; text-align: center; }
 .tm-display { font-variant-numeric: tabular-nums; font-weight: 800; letter-spacing: 1px;
-  font-size: calc(40px * var(--font-scale)); color: #1f3a5f; padding: 6px 0; }
-.tm-display.study { color: #c85a1e; }
+  font-size: calc(40px * var(--font-scale)); color: #2b86d8; padding: 6px 0; text-shadow: 0 1px 6px rgba(60,150,230,0.28); transition: color 0.15s ease; }
+.tm-display.study { color: #2b86d8; }
 .tm-display.ring { animation: tmRing 0.5s ease infinite; color: #e0492c; }
+.tm-display.study.paused, .tm-display.paused { color: #97a3af !important; text-shadow: none; }   /* 휴식 중 = 회색 */
 @keyframes tmRing { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 .tm-bell { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .tm-bell > span { font-size: calc(12px * var(--font-scale)); color: #556; font-weight: 700; }
@@ -1040,7 +1045,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
           <div class="set-row">
             <label>바탕화면</label>
             <div class="seg wp-seg" id="set-wp">
-              <button data-v="0">에어로</button><button data-v="1">선셋</button><button data-v="2">딥씨</button><button data-v="custom">🖼️ 내 사진</button>
+              <button data-v="0">에어로</button><button data-v="1">선셋</button><button data-v="2">딥씨</button>
             </div>
           </div>
           <div class="set-row set-row-wp">
@@ -6255,7 +6260,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
     stopNormal();
     if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }
     tmStRun = false; tmStMs = 0;
-    const sd = document.getElementById("tm-study-disp"); if (sd) sd.textContent = "00:00:00";
+    const sd = document.getElementById("tm-study-disp"); if (sd) { sd.textContent = "00:00:00"; sd.classList.remove("paused"); sd.style.color = ""; }
   }
   // --- 열공 스톱워치 ---
   function startStudy() {
@@ -6263,11 +6268,13 @@ html, body { width: 100%; height: 100%; overflow: hidden;
     if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }   // 방어: 남은 인터벌 정리
     window.Audio2.ensure(); window.Audio2.click(700);
     tmStRun = true; tmStBase = Date.now() - tmStMs;
+    { const sd = document.getElementById("tm-study-disp"); sd.classList.remove("paused"); sd.style.color = ""; }   // 시작 = 파랑(CSS)
     tmStIv = setInterval(() => { tmStMs = Date.now() - tmStBase; document.getElementById("tm-study-disp").textContent = fmtHMS(tmStMs / 1000); }, 200);
   }
   function pauseStudy() {   // 휴식: 시간 동결(기록·리셋 없음) → 시작 누르면 이어서
     if (!tmStRun) return;
     tmStRun = false; if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }
+    { const sd = document.getElementById("tm-study-disp"); sd.classList.add("paused"); sd.style.color = "#97a3af"; }   // 휴식 = 회색
     window.Audio2.click(440);   // tmStMs 유지
   }
   function stopStudy() {
@@ -6276,7 +6283,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
     if (secs < 1) { tmStRun = false; tmStMs = 0; document.getElementById("tm-study-disp").textContent = "00:00:00"; window.Audio2.click(300); return; }
     tmStRun = false;
     saveStudySession(secs); renderStudyRecords(true); window.Audio2.bell("chime");
-    tmStMs = 0; document.getElementById("tm-study-disp").textContent = "00:00:00";
+    tmStMs = 0; const sd2 = document.getElementById("tm-study-disp"); sd2.textContent = "00:00:00"; sd2.classList.remove("paused"); sd2.style.color = "";
   }
   function studyData() {
     let d = null; try { d = JSON.parse(localStorage.getItem(TM_KEY)); } catch (e) {}

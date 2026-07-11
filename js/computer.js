@@ -280,7 +280,7 @@
     stopNormal();
     if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }
     tmStRun = false; tmStMs = 0;
-    const sd = document.getElementById("tm-study-disp"); if (sd) sd.textContent = "00:00:00";
+    const sd = document.getElementById("tm-study-disp"); if (sd) { sd.textContent = "00:00:00"; sd.classList.remove("paused"); sd.style.color = ""; }
   }
   // --- 열공 스톱워치 ---
   function startStudy() {
@@ -288,11 +288,13 @@
     if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }   // 방어: 남은 인터벌 정리
     window.Audio2.ensure(); window.Audio2.click(700);
     tmStRun = true; tmStBase = Date.now() - tmStMs;
+    { const sd = document.getElementById("tm-study-disp"); sd.classList.remove("paused"); sd.style.color = ""; }   // 시작 = 파랑(CSS)
     tmStIv = setInterval(() => { tmStMs = Date.now() - tmStBase; document.getElementById("tm-study-disp").textContent = fmtHMS(tmStMs / 1000); }, 200);
   }
   function pauseStudy() {   // 휴식: 시간 동결(기록·리셋 없음) → 시작 누르면 이어서
     if (!tmStRun) return;
     tmStRun = false; if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }
+    { const sd = document.getElementById("tm-study-disp"); sd.classList.add("paused"); sd.style.color = "#97a3af"; }   // 휴식 = 회색
     window.Audio2.click(440);   // tmStMs 유지
   }
   function stopStudy() {
@@ -301,7 +303,7 @@
     if (secs < 1) { tmStRun = false; tmStMs = 0; document.getElementById("tm-study-disp").textContent = "00:00:00"; window.Audio2.click(300); return; }
     tmStRun = false;
     saveStudySession(secs); renderStudyRecords(true); window.Audio2.bell("chime");
-    tmStMs = 0; document.getElementById("tm-study-disp").textContent = "00:00:00";
+    tmStMs = 0; const sd2 = document.getElementById("tm-study-disp"); sd2.textContent = "00:00:00"; sd2.classList.remove("paused"); sd2.style.color = "";
   }
   function studyData() {
     let d = null; try { d = JSON.parse(localStorage.getItem(TM_KEY)); } catch (e) {}
