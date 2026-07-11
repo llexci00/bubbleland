@@ -205,10 +205,33 @@
               <button id="tm-study-stop" class="os-btn">⏹ 멈춤</button>
             </div>
             <div class="tm-records">
-              <div class="tm-rec-title">📚 오늘의 열공 기록</div>
+              <div class="tm-rec-title"><span>📚 오늘의 열공 기록</span><button id="tm-cheer" class="tm-cheer-btn" title="응원받기">🐰 응원</button></div>
               <div class="tm-rec-row">🏆 최고 <b id="tm-rec-best">기록 없음</b></div>
               <div class="tm-rec-row">🐢 최소 <b id="tm-rec-min">기록 없음</b></div>
               <div class="tm-rec-row">⏰ 총 공부 <b id="tm-rec-total">0분</b> <span id="tm-rec-cnt" class="tm-rec-cnt"></span></div>
+            </div>
+            <!-- 응원 토끼 (튀어나옴) -->
+            <div id="tm-rabbit" class="tm-rabbit">
+              <div class="tm-rabbit-bubble" id="tm-rabbit-bubble">화이팅!</div>
+              <svg class="tm-rabbit-svg" viewBox="0 0 64 74" xmlns="http://www.w3.org/2000/svg">
+                <g class="tmr-wiggle">
+                  <ellipse cx="24" cy="22" rx="6.5" ry="17" fill="#fff" stroke="#e7cdd8" stroke-width="1.6" transform="rotate(-11 24 22)"/>
+                  <ellipse cx="40" cy="22" rx="6.5" ry="17" fill="#fff" stroke="#e7cdd8" stroke-width="1.6" transform="rotate(11 40 22)"/>
+                  <ellipse cx="24" cy="23" rx="2.6" ry="10" fill="#ffc3d5" transform="rotate(-11 24 23)"/>
+                  <ellipse cx="40" cy="23" rx="2.6" ry="10" fill="#ffc3d5" transform="rotate(11 40 23)"/>
+                  <ellipse cx="32" cy="50" rx="20" ry="19" fill="#fff" stroke="#e7cdd8" stroke-width="1.6"/>
+                  <path d="M50 43 l9 -4 M50 43 l8 5" stroke="#e6e6ee" stroke-width="3" stroke-linecap="round" fill="none"/>
+                  <rect x="11" y="40" width="42" height="6.5" rx="3.2" fill="#fbfbff" stroke="#d3d3dd" stroke-width="1"/>
+                  <circle cx="32" cy="43.2" r="2.6" fill="#e0492c"/>
+                  <circle cx="24.5" cy="52" r="2.6" fill="#3a2b2b"/>
+                  <circle cx="39.5" cy="52" r="2.6" fill="#3a2b2b"/>
+                  <circle cx="18.5" cy="57" r="3" fill="#ffb8cd" opacity="0.85"/>
+                  <circle cx="45.5" cy="57" r="3" fill="#ffb8cd" opacity="0.85"/>
+                  <circle cx="32" cy="56" r="1.6" fill="#e07"/>
+                  <path d="M32 57.5 q-2.5 2.2 -5 0.6 M32 57.5 q2.5 2.2 5 0.6" stroke="#caa" stroke-width="1.2" fill="none"/>
+                  <circle cx="13" cy="46" r="5" fill="#fff" stroke="#e7cdd8" stroke-width="1.4"/>
+                </g>
+              </svg>
             </div>
           </div>
         </div>

@@ -19,6 +19,8 @@
   let tmStRun = false, tmStIv = null, tmStBase = 0, tmStMs = 0;                    // 열공(스톱워치)
   const TM_MAX = 5 * 3600, TM_KEY = "bubbleland.study";
   const TM_BELLS = [{ id: "ding", name: "딩동" }, { id: "bell", name: "종" }, { id: "beep", name: "삐삐" }, { id: "chime", name: "차임" }];
+  let cheerT = null;
+  const CHEERS = ["화이팅! 💪", "조금만 더! 🔥", "집중 집중! 📚", "거의 다 왔어! ✨", "오늘도 화이팅! ⭐", "잘하고 있어! 🐰", "포기 없기! 💫"];
 
   // ============================================================
   //  창 열고 닫기
@@ -245,9 +247,19 @@
     document.getElementById("tm-study-start").addEventListener("click", startStudy);
     document.getElementById("tm-study-pause").addEventListener("click", pauseStudy);
     document.getElementById("tm-study-stop").addEventListener("click", stopStudy);
+    document.getElementById("tm-cheer").addEventListener("click", cheerRabbit);
     updateNormalUI(); renderStudyRecords();
   }
   function openTimer() { initTimer(); renderStudyRecords(); }
+  // 응원 토끼 튀어나오기
+  function cheerRabbit() {
+    const r = document.getElementById("tm-rabbit"), b = document.getElementById("tm-rabbit-bubble");
+    if (!r) return;
+    b.textContent = CHEERS[(Math.random() * CHEERS.length) | 0];
+    r.classList.remove("show"); void r.offsetWidth; r.classList.add("show");
+    window.Audio2.ensure(); window.Audio2.blip(920); window.Audio2.blip(1150);   // 뾰롱 귀여운 소리
+    clearTimeout(cheerT); cheerT = setTimeout(() => r.classList.remove("show"), 2700);
+  }
   function setTimerMode(mode) {
     document.querySelectorAll(".tm-tab").forEach((b) => b.classList.toggle("on", b.dataset.mode === mode));
     document.getElementById("tm-normal").classList.toggle("hidden", mode !== "normal");
