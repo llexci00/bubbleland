@@ -121,7 +121,7 @@
 .tm-btn { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #bcd; background: #fff; color: #1f5fa8;
   font-weight: 800; font-size: 15px; cursor: pointer; line-height: 1; }
 .tm-btn:active { transform: translateY(1px); }
-.tm-hint { font-size: calc(11px * var(--font-scale)); color: #8a93a0; text-align: center; }
+.tm-hint { display: none; }
 .tm-display { font-variant-numeric: tabular-nums; font-weight: 800; letter-spacing: 1px;
   font-size: calc(40px * var(--font-scale)); color: #2b86d8; padding: 6px 0; text-shadow: 0 1px 6px rgba(60,150,230,0.28); transition: color 0.15s ease; }
 .tm-display.study { color: #2b86d8; }
