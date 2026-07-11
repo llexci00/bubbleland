@@ -6044,7 +6044,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   let tmReady = false, tmBell = "ding";
   let tmTotal = 0, tmLeft = 0, tmRun = false, tmIv = null, tmEnd = 0;             // 일반(카운트다운) — 처음엔 0
   let tmStRun = false, tmStIv = null, tmStBase = 0, tmStMs = 0;                    // 열공(스톱워치)
-  const TM_MAX = 5 * 3600, TM_KEY = "bubbleland.study";
+  const TM_MAX = 24 * 3600, TM_STUDY_MAX = 24 * 3600 * 1000, TM_KEY = "bubbleland.study";   // 최대 24시간
   const TM_BELLS = [{ id: "ding", name: "딩동" }, { id: "bell", name: "종" }, { id: "beep", name: "삐삐" }, { id: "chime", name: "차임" }];
   let cheerT = null;
   const CHEERS = [
@@ -6396,7 +6396,11 @@ html, body { width: 100%; height: 100%; overflow: hidden;
     window.Audio2.ensure(); window.Audio2.click(700);
     tmStRun = true; tmStBase = Date.now() - tmStMs;
     { const sd = document.getElementById("tm-study-disp"); sd.classList.remove("paused"); sd.style.color = ""; }   // 시작 = 파랑(CSS)
-    tmStIv = setInterval(() => { tmStMs = Date.now() - tmStBase; document.getElementById("tm-study-disp").textContent = fmtHMS(tmStMs / 1000); }, 200);
+    tmStIv = setInterval(() => {
+      tmStMs = Date.now() - tmStBase;
+      if (tmStMs >= TM_STUDY_MAX) { tmStMs = TM_STUDY_MAX; document.getElementById("tm-study-disp").textContent = fmtHMS(tmStMs / 1000); stopStudy(); return; }   // 24시간 상한 → 자동 정지·기록
+      document.getElementById("tm-study-disp").textContent = fmtHMS(tmStMs / 1000);
+    }, 200);
   }
   function pauseStudy() {   // 휴식: 시간 동결(기록·리셋 없음) → 시작 누르면 이어서
     if (!tmStRun) return;
