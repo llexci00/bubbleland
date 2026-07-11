@@ -184,7 +184,7 @@
           <div id="tm-normal" class="tm-panel">
             <div class="tm-setup" id="tm-setup">
               <div class="tm-adj"><button class="tm-btn" data-h="-1">−</button><b id="tm-h">0</b><span>시간</span><button class="tm-btn" data-h="1">＋</button></div>
-              <div class="tm-adj"><button class="tm-btn" data-m="-5">−</button><b id="tm-m">10</b><span>분</span><button class="tm-btn" data-m="5">＋</button></div>
+              <div class="tm-adj"><button class="tm-btn" data-m="-1">−</button><b id="tm-m">10</b><span>분</span><button class="tm-btn" data-m="1">＋</button></div>
             </div>
             <div class="tm-hint">최대 5시간까지 설정할 수 있어요</div>
             <div class="tm-display" id="tm-normal-disp">00:10:00</div>
@@ -197,10 +197,11 @@
           </div>
           <!-- 열공 타이머 -->
           <div id="tm-study" class="tm-panel hidden">
-            <div class="tm-hint">시작을 누르면 공부 시간을 재요. 멈추면 오늘 기록에 저장돼요!</div>
+            <div class="tm-hint">시작으로 공부 시간을 재요. 휴식은 잠깐 멈춤(이어서 시작), 멈춤은 세션을 끝내고 오늘 기록에 저장해요!</div>
             <div class="tm-display study" id="tm-study-disp">00:00:00</div>
             <div class="tm-ctrls">
               <button id="tm-study-start" class="os-btn ok">▶ 시작</button>
+              <button id="tm-study-pause" class="os-btn">⏸ 휴식</button>
               <button id="tm-study-stop" class="os-btn">⏹ 멈춤</button>
             </div>
             <div class="tm-records">
@@ -229,6 +230,12 @@
             </div>
           </div>
           <div class="set-row">
+            <label>날씨 소리</label>
+            <div class="seg" id="set-ambient">
+              <button data-v="on">켜기</button><button data-v="off">끄기</button>
+            </div>
+          </div>
+          <div class="set-row">
             <label>글씨 크기</label>
             <div class="seg" id="set-font">
               <button data-v="s">작게</button><button data-v="m">보통</button><button data-v="l">크게</button>
@@ -237,7 +244,15 @@
           <div class="set-row">
             <label>바탕화면</label>
             <div class="seg wp-seg" id="set-wp">
-              <button data-v="0">에어로</button><button data-v="1">선셋</button><button data-v="2">딥씨</button>
+              <button data-v="0">에어로</button><button data-v="1">선셋</button><button data-v="2">딥씨</button><button data-v="custom">🖼️ 내 사진</button>
+            </div>
+          </div>
+          <div class="set-row set-row-wp">
+            <label>내 사진 배경</label>
+            <div class="wp-upload">
+              <button id="set-wp-pick" class="os-btn">📁 사진 불러오기</button>
+              <button id="set-wp-clear" class="os-btn">지우기</button>
+              <input type="file" id="set-wp-file" accept="image/*" hidden />
             </div>
           </div>
           <div class="set-row">

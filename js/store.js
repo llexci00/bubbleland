@@ -7,7 +7,7 @@
 
   const defaults = {
     weather: "sunny",
-    settings: { sfx: true, music: true, font: "m", wallpaper: 0, brightness: "m" },
+    settings: { sfx: true, music: true, ambient: true, font: "m", wallpaper: 0, brightness: "m", customWp: null },
     bubbles: [],            // {id,text,imp,x,y,vx,vy}
     doneToday: 0,
     doneStamp: "",

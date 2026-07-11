@@ -18,6 +18,7 @@
   }
   function sfxOn() { return !!(window.App && window.App.state.settings.sfx !== false); }   // 효과음
   function musicOn() { return !!(window.App && window.App.state.settings.music !== false); } // 노래
+  function ambientOn() { return !!(window.App && window.App.state.settings.ambient !== false); } // 날씨/환경 소리
 
   function pop() {
     if (!sfxOn() || !ensure()) return;
@@ -199,7 +200,7 @@
     if (ambientKind === kind && ambient) return;
     stopAmbient();
     ambientKind = kind;
-    if (!sfxOn() || !kind) return;
+    if (!sfxOn() || !ambientOn() || !kind) return;   // 날씨 소리 끄면 재생 안 함
 
     const nodes = [];
     if (kind === "water") {
@@ -241,7 +242,7 @@
   function refreshAmbient() {
     const k = ambientKind;
     stopAmbient();
-    if (sfxOn() && k) setAmbient(k);
+    if (sfxOn() && ambientOn() && k) setAmbient(k);
   }
 
   // ---- 라디오: 실제 음원(m4a) 재생 ----

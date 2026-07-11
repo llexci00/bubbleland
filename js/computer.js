@@ -33,7 +33,7 @@
     if (id === "timer") openTimer();
     if (id === "arcade") window.Arcade.open();
   }
-  function closeWin(id) { const w = document.getElementById("win-" + id); if (w) w.classList.add("hidden"); if (id === "arcade") window.Arcade.close(); window.Audio2.click(360); }
+  function closeWin(id) { const w = document.getElementById("win-" + id); if (w) w.classList.add("hidden"); if (id === "arcade") window.Arcade.close(); if (id === "timer") stopAllTimers(); window.Audio2.click(360); }
   let zTop = 30;
   function bringFront(w) { w.style.zIndex = ++zTop; }
 
@@ -243,6 +243,7 @@
     document.getElementById("tm-stop").addEventListener("click", stopNormal);
     document.getElementById("tm-reset").addEventListener("click", resetNormal);
     document.getElementById("tm-study-start").addEventListener("click", startStudy);
+    document.getElementById("tm-study-pause").addEventListener("click", pauseStudy);
     document.getElementById("tm-study-stop").addEventListener("click", stopStudy);
     updateNormalUI(); renderStudyRecords();
   }
@@ -273,7 +274,14 @@
     }, 250);
   }
   function stopNormal() { tmRun = false; if (tmIv) clearInterval(tmIv); tmIv = null; document.getElementById("tm-setup").classList.remove("lock"); }
-  function resetNormal() { stopNormal(); tmLeft = tmTotal; updateNormalUI(); document.getElementById("tm-normal-disp").classList.remove("ring"); window.Audio2.click(360); }
+  function resetNormal() { stopNormal(); tmTotal = 0; tmLeft = 0; updateNormalUI(); document.getElementById("tm-normal-disp").classList.remove("ring"); window.Audio2.click(360); }
+  // 창 닫기 / 컴퓨터 나가기 → 타이머 완전 정지 (진행 중이던 열공 세션은 기록 없이 폐기)
+  function stopAllTimers() {
+    stopNormal();
+    if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }
+    tmStRun = false; tmStMs = 0;
+    const sd = document.getElementById("tm-study-disp"); if (sd) sd.textContent = "00:00:00";
+  }
   // --- 열공 스톱워치 ---
   function startStudy() {
     if (tmStRun) return;
@@ -282,13 +290,17 @@
     tmStRun = true; tmStBase = Date.now() - tmStMs;
     tmStIv = setInterval(() => { tmStMs = Date.now() - tmStBase; document.getElementById("tm-study-disp").textContent = fmtHMS(tmStMs / 1000); }, 200);
   }
+  function pauseStudy() {   // 휴식: 시간 동결(기록·리셋 없음) → 시작 누르면 이어서
+    if (!tmStRun) return;
+    tmStRun = false; if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }
+    window.Audio2.click(440);   // tmStMs 유지
+  }
   function stopStudy() {
     if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }   // 항상 인터벌부터 정리 (누수 방지)
-    if (!tmStRun) return;
-    tmStRun = false;
     const secs = tmStMs / 1000;
-    if (secs >= 1) { saveStudySession(secs); renderStudyRecords(true); window.Audio2.bell("chime"); }
-    else window.Audio2.click(300);
+    if (secs < 1) { tmStRun = false; tmStMs = 0; document.getElementById("tm-study-disp").textContent = "00:00:00"; window.Audio2.click(300); return; }
+    tmStRun = false;
+    saveStudySession(secs); renderStudyRecords(true); window.Audio2.bell("chime");
     tmStMs = 0; document.getElementById("tm-study-disp").textContent = "00:00:00";
   }
   function studyData() {
@@ -318,6 +330,7 @@
     const s = window.App.state.settings;
     segSet("set-sfx", s.sfx !== false ? "on" : "off");
     segSet("set-music", s.music !== false ? "on" : "off");
+    segSet("set-ambient", s.ambient !== false ? "on" : "off");
     segSet("set-font", s.font);
     segSet("set-wp", String(s.wallpaper));
     segSet("set-bright", s.brightness || "m");
@@ -325,7 +338,16 @@
   function segSet(id, val) {
     document.getElementById(id).querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.v === val));
   }
-  function applyWallpaper(n) { desktop.className = "desktop wp-" + n; }
+  function applyWallpaper(n) {
+    if (String(n) === "custom" && window.App.state.settings.customWp) {
+      desktop.className = "desktop wp-custom";
+      desktop.style.backgroundImage = "url(" + window.App.state.settings.customWp + ")";
+    } else {
+      desktop.className = "desktop wp-" + n;
+      desktop.style.backgroundImage = "";
+    }
+  }
+  function pickWallpaperFile() { document.getElementById("set-wp-file").click(); }
   function applyFont(f) { document.documentElement.style.setProperty("--font-scale", { s: 0.85, m: 1, l: 1.2 }[f] || 1); }
 
   function initSettings() {
@@ -344,6 +366,14 @@
       window.App.applySettings();
       window.Audio2.ensure(); window.Audio2.syncMusic();
     });
+    document.getElementById("set-ambient").addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      window.App.state.settings.ambient = b.dataset.v === "on";
+      segSet("set-ambient", b.dataset.v);
+      window.App.applySettings();
+      window.Audio2.ensure(); window.Audio2.refreshAmbient();   // 켜면 복원 · 끄면 정지
+      window.Audio2.click(560);
+    });
     document.getElementById("set-font").addEventListener("click", (e) => {
       const b = e.target.closest("button"); if (!b) return;
       window.App.state.settings.font = b.dataset.v; segSet("set-font", b.dataset.v);
@@ -351,8 +381,37 @@
     });
     document.getElementById("set-wp").addEventListener("click", (e) => {
       const b = e.target.closest("button"); if (!b) return;
-      window.App.state.settings.wallpaper = +b.dataset.v; segSet("set-wp", b.dataset.v);
-      applyWallpaper(b.dataset.v); window.App.applySettings(); window.Audio2.click(500);
+      const v = b.dataset.v;
+      if (v === "custom" && !window.App.state.settings.customWp) { pickWallpaperFile(); return; }   // 사진 없으면 바로 고르기
+      window.App.state.settings.wallpaper = v; segSet("set-wp", v);
+      applyWallpaper(v); window.App.applySettings(); window.Audio2.click(500);
+    });
+    // 배경화면: 내 사진 불러오기 (축소 후 저장)
+    document.getElementById("set-wp-pick").addEventListener("click", pickWallpaperFile);
+    document.getElementById("set-wp-file").addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0]; e.target.value = ""; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const maxW = 1280; let w = img.width, h = img.height;
+          if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+          const c = document.createElement("canvas"); c.width = w; c.height = h;
+          c.getContext("2d").drawImage(img, 0, 0, w, h);
+          let data; try { data = c.toDataURL("image/jpeg", 0.82); } catch (err) { data = reader.result; }
+          try { window.App.state.settings.customWp = data; window.App.state.settings.wallpaper = "custom"; window.App.save(); }
+          catch (err) { alert("이미지가 너무 커서 저장할 수 없어요 😢 더 작은 사진을 골라봐요!"); return; }
+          applyWallpaper("custom"); segSet("set-wp", "custom"); window.Audio2.click(660);
+        };
+        img.onerror = () => alert("이미지를 불러오지 못했어요 😢");
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById("set-wp-clear").addEventListener("click", () => {
+      window.App.state.settings.customWp = null;
+      if (String(window.App.state.settings.wallpaper) === "custom") { window.App.state.settings.wallpaper = "0"; applyWallpaper("0"); segSet("set-wp", "0"); }
+      window.App.save(); window.Audio2.click(360);
     });
     document.getElementById("set-bright").addEventListener("click", (e) => {
       const b = e.target.closest("button"); if (!b) return;
@@ -436,6 +495,6 @@
       applyWallpaper(window.App.state.settings.wallpaper);
       document.querySelectorAll(".di-canvas").forEach((cv) => drawIcon(cv, cv.dataset.icon));
     },
-    leave() { if (window.Arcade) window.Arcade.close(); },
+    leave() { if (window.Arcade) window.Arcade.close(); stopAllTimers(); },
   };
 })();
