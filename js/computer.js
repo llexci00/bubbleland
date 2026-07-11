@@ -67,7 +67,13 @@
   // ============================================================
   function openWin(id) {
     const w = document.getElementById("win-" + id);
-    if (w) { w.classList.remove("hidden"); bringFront(w); }
+    if (w) {
+      w.style.transform = ""; w.classList.remove("hidden");   // 애니메이션 다시 재생
+      const host = (desktop || document.body).getBoundingClientRect();
+      w.style.left = Math.max(0, Math.round((host.width - w.offsetWidth) / 2)) + "px";   // 항상 중앙에서 열림
+      w.style.top = Math.max(0, Math.round((host.height - w.offsetHeight) / 2)) + "px";
+      bringFront(w);
+    }
     window.Audio2.click(560);
     if (id === "diary") refreshDiary();
     if (id === "settings") syncSettings();
@@ -78,6 +84,27 @@
   function closeWin(id) { const w = document.getElementById("win-" + id); if (w) w.classList.add("hidden"); if (id === "arcade") window.Arcade.close(); if (id === "timer") stopAllTimers(); window.Audio2.click(360); }
   let zTop = 30;
   function bringFront(w) { w.style.zIndex = ++zTop; }
+
+  // ---- 창 이동 (타이틀바 드래그) ----
+  let winDrag = null;
+  function startWinDrag(e) {
+    const title = e.target.closest(".os-title");
+    if (!title || e.target.closest(".os-x")) return;   // 닫기(X)는 제외
+    const w = title.closest(".os-win"); if (!w) return;
+    bringFront(w);
+    const wr = w.getBoundingClientRect();
+    winDrag = { w, offX: e.clientX - wr.left, offY: e.clientY - wr.top };
+    e.preventDefault();
+  }
+  function moveWinDrag(e) {
+    if (!winDrag) return;
+    const w = winDrag.w, host = (desktop || document.body).getBoundingClientRect();
+    let x = e.clientX - winDrag.offX - host.left, y = e.clientY - winDrag.offY - host.top;
+    x = Math.max(-w.offsetWidth + 64, Math.min(host.width - 64, x));   // 최소 64px는 화면 안에
+    y = Math.max(0, Math.min(host.height - 40, y));
+    w.style.left = x + "px"; w.style.top = y + "px";
+  }
+  function endWinDrag() { winDrag = null; }
 
   // ============================================================
   //  다이어리
@@ -507,6 +534,10 @@
       });
       // 창 닫기 X
       document.querySelectorAll(".os-x").forEach((x) => x.addEventListener("click", () => closeWin(x.dataset.close)));
+      // 창 이동 (타이틀바 드래그)
+      desktop.addEventListener("pointerdown", startWinDrag);
+      window.addEventListener("pointermove", moveWinDrag);
+      window.addEventListener("pointerup", endWinDrag);
       // 다이어리 저장 + 기분 선택 + 친구 코멘트
       document.getElementById("diary-save").addEventListener("click", saveDiary);
       document.getElementById("diary-comment").addEventListener("click", () => {
