@@ -1,0 +1,74 @@
+/* ============================================================
+   base.css — 공통 (리셋 · 화면 · 모달 · 전환)
+   ============================================================ */
+:root { --font-scale: 1; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden;
+  font-family: "Tahoma", "Segoe UI", "맑은 고딕", "Malgun Gothic", sans-serif;
+  user-select: none; -webkit-user-select: none; background: #0a2b45; }
+
+.app { position: fixed; inset: 0; }
+
+/* 화면 스위칭 */
+.screen { position: absolute; inset: 0; opacity: 0; visibility: hidden;
+  transition: opacity 0.25s ease; }
+.screen.active { opacity: 1; visibility: visible; }
+
+.hidden { display: none !important; }
+
+/* 전환 오버레이 (어항 줌인) */
+.transition { position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  background: radial-gradient(circle at 78% 46%, rgba(120,205,240,0.0), rgba(90,180,230,0.0)); }
+.transition.zooming { animation: zoomIn 0.32s ease forwards; pointer-events: all;
+  background: radial-gradient(circle at 78% 46%, rgba(150,220,250,0.9), rgba(60,140,200,0.95)); }
+.transition.fadeout { animation: fadeOut 0.26s ease forwards; }
+/* 상점 입장: 어두워졌다가(walk-out) 발소리 후 밝아짐(walk-in) */
+.transition.walk-out { pointer-events: all; background: #12202e; animation: fadeIn 0.45s ease forwards; }
+.transition.walk-in { pointer-events: all; background: #12202e; animation: fadeOut 0.5s ease forwards; }
+@keyframes zoomIn { from { opacity: 0; transform: scale(1.4); } to { opacity: 1; transform: scale(1); } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ===== 방울 추가/수정 모달 (Windows XP 창) ===== */
+.modal-overlay { position: fixed; inset: 0; z-index: 50; display: flex;
+  align-items: center; justify-content: center; background: rgba(20,50,80,0.28); backdrop-filter: blur(2px); }
+.win98 { width: 320px; border-radius: 8px 8px 6px 6px; overflow: hidden; background: #ece9d8;
+  border: 1px solid #0a3a6b; box-shadow: 0 12px 40px rgba(0,30,60,0.5);
+  animation: winpop 0.22s cubic-bezier(.2,1.3,.5,1); }
+@keyframes winpop { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.win98-title { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px 6px 12px;
+  color: #fff; font-weight: 700; font-size: calc(14px * var(--font-scale));
+  background: linear-gradient(180deg, #4aa0ee 0%, #2a7fd0 10%, #1f5fa8 55%, #184c8c 100%);
+  text-shadow: 0 1px 2px rgba(0,20,50,0.6); }
+.win98-x { width: 22px; height: 22px; border: 1px solid rgba(255,255,255,0.6); border-radius: 4px;
+  background: linear-gradient(180deg, #f08a8a, #c23b3b); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; line-height: 1; }
+.win98-x:hover { filter: brightness(1.1); }
+.win98-body { padding: 14px 16px 16px; }
+.field-label { display: block; font-size: calc(12px * var(--font-scale)); color: #333; margin: 4px 0 4px; font-weight: 700; }
+.win98-input { width: 100%; padding: 7px 9px; font-family: inherit; font-size: calc(14px * var(--font-scale));
+  border: 2px inset #b7b7a8; border-radius: 3px; background: #fff; outline: none; }
+.win98-input:focus { border-color: #2a7fd0; }
+.importance-row { display: flex; gap: 4px; margin-bottom: 4px; flex-wrap: wrap; }
+.imp-btn { flex: 1 1 auto; min-width: 48px; padding: 6px 4px; font-family: inherit; font-size: calc(12px * var(--font-scale));
+  font-weight: 700; cursor: pointer; border: 1px solid #9aa; border-radius: 5px;
+  background: linear-gradient(180deg, #fff, #dfe6ee); color: #234; transition: filter 0.12s ease; }
+.imp-btn:hover { filter: brightness(1.05); }
+.imp-btn.imp-selected { background: linear-gradient(180deg, #bfe6ff, #4aa0ee); color: #fff; border-color: #1f5fa8;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
+.win98-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+.win98-btn { min-width: 74px; padding: 6px 14px; font-family: inherit; font-size: calc(13px * var(--font-scale));
+  font-weight: 700; cursor: pointer; border: 1px solid #7a8899; border-radius: 5px;
+  background: linear-gradient(180deg, #fff, #d7dee6); color: #123; }
+.win98-btn:hover { filter: brightness(1.04); }
+.win98-btn.ok { background: linear-gradient(180deg, #cdeeff, #4aa0ee); color: #fff; border-color: #1f5fa8; }
+.win98-btn:active { transform: translateY(1px); }
+
+/* 공용 유리 버튼 */
+.glass-btn { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px; border: none;
+  border-radius: 12px; cursor: pointer; font-family: inherit; font-size: calc(14px * var(--font-scale)); font-weight: 700;
+  color: #0a3350; background: linear-gradient(180deg, #ffffff 0%, #dff0ff 48%, #bfe4ff 52%, #d6ecff 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 3px 8px rgba(0,40,80,0.3); transition: transform 0.08s ease, filter 0.15s ease; }
+.glass-btn:hover { filter: brightness(1.06); }
+.glass-btn:active { transform: translateY(1px); }
+.glass-btn.primary { background: linear-gradient(180deg, #d9f3ff, #4aa0ee); color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 3px 10px rgba(0,60,120,0.4); }

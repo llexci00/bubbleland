@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🫧 Frutiger Room — 비눗방울 할일</title>
+<link rel="stylesheet" href="css/base.css" />
+<link rel="stylesheet" href="css/room.css" />
+<link rel="stylesheet" href="css/rooms.css" />
+<link rel="stylesheet" href="css/bubbles.css" />
+<link rel="stylesheet" href="css/computer.css" />
+</head>
+<body>
+<div id="app" class="app">
+
+  <!-- ================= 상단바 (방 전환 · 소리 · 도움말 · 날씨) ================= -->
+  <div id="topbar" class="topbar">
+    <div class="tb-rooms">
+      <button class="room-tab active" data-room="room"><canvas class="ui-ico" width="16" height="16" data-icon="room"></canvas><span>방</span></button>
+      <button class="room-tab" data-room="living"><canvas class="ui-ico" width="16" height="16" data-icon="living"></canvas><span>거실</span></button>
+      <button class="room-tab" data-room="kitchen"><canvas class="ui-ico" width="16" height="16" data-icon="kitchen"></canvas><span>부엌</span></button>
+    </div>
+    <div class="tb-right">
+      <span class="tb-coins" id="tb-coins">🪙 0</span>
+      <span class="tb-clock" id="tb-clock">00:00</span>
+      <button class="tb-ico-btn" id="tb-sound" title="소리"><canvas class="ui-ico" width="16" height="16" data-icon="sound"></canvas></button>
+      <button class="tb-ico-btn" id="tb-help" title="도움말"><canvas class="ui-ico" width="16" height="16" data-icon="help"></canvas></button>
+      <div class="tb-wx" id="tb-wx">
+        <button class="tb-ico-btn" id="tb-wx-toggle" title="날씨"><canvas class="ui-ico" width="16" height="16" data-icon="menu"></canvas></button>
+        <div class="tb-wx-drop hidden" id="tb-wx-drop">
+          <button data-weather="sunny" title="맑음"><canvas class="ui-ico" width="16" height="16" data-icon="sunny"></canvas></button>
+          <button data-weather="rain" title="비"><canvas class="ui-ico" width="16" height="16" data-icon="rain"></canvas></button>
+          <button data-weather="snow" title="눈"><canvas class="ui-ico" width="16" height="16" data-icon="snow"></canvas></button>
+          <button data-weather="rainbow" title="무지개"><canvas class="ui-ico" width="16" height="16" data-icon="rainbow"></canvas></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 방 (메인 · 픽셀아트) ================= -->
+  <section id="screen-room" class="screen active">
+    <canvas id="room-canvas" class="room-canvas"></canvas>
+  </section>
+
+  <!-- ================= 거실 ================= -->
+  <section id="screen-living" class="screen">
+    <canvas id="living-canvas" class="room-canvas"></canvas>
+  </section>
+
+  <!-- ================= 부엌 ================= -->
+  <section id="screen-kitchen" class="screen">
+    <canvas id="kitchen-canvas" class="room-canvas"></canvas>
+  </section>
+
+  <!-- ================= 공원 (마을) ================= -->
+  <section id="screen-park" class="screen">
+    <canvas id="park-canvas" class="room-canvas"></canvas>
+  </section>
+
+  <!-- ================= 상점 ================= -->
+  <section id="screen-shop" class="screen">
+    <canvas id="shop-canvas" class="room-canvas"></canvas>
+    <div id="keeper-bubble" class="keeper-bubble hidden"></div>
+    <div class="shop-panel hidden" id="shop-panel">
+      <div class="shop-panel-head">🏪 마을 상점 <button id="shop-panel-close" class="shop-panel-x">✕</button></div>
+      <div class="shop-cats" id="shop-cats">
+        <button class="on" data-cat="all">전체</button>
+        <button data-cat="furniture">가구</button>
+        <button data-cat="plant">식물</button>
+        <button data-cat="wall">벽장식</button>
+        <button data-cat="floor">바닥</button>
+        <button data-cat="toy">장난감</button>
+        <button data-cat="skin">✨스킨</button>
+        <button data-cat="theme">🎨테마</button>
+      </div>
+      <div id="shop-grid" class="shop-grid"></div>
+    </div>
+  </section>
+
+  <!-- 밖(공원/상점) 이동 버튼 -->
+  <div id="outside-nav" class="outside-nav hidden">
+    <button id="nav-home" class="onav-btn hidden">🏠 집으로</button>
+    <button id="nav-exit" class="onav-btn hidden">🚪 상점 나가기</button>
+  </div>
+
+  <!-- 거실 → 밖으로 나가기 -->
+  <button id="go-out-btn" class="go-out-btn hidden">🚪 밖으로 나가기</button>
+
+  <!-- 방 꾸미기 버튼 + 팔레트 -->
+  <button id="decor-edit-btn" class="decor-edit-btn">🎨 꾸미기</button>
+  <div id="decor-palette" class="decor-palette hidden"></div>
+
+  <!-- ================= 어항 속 할일 화면 ================= -->
+  <section id="screen-bubbles" class="screen">
+    <canvas id="fish-canvas" class="fish-canvas"></canvas>   <!-- 배경 물고기 -->
+    <div class="water-rays"></div>
+    <canvas id="ripple-canvas" class="ripple-canvas"></canvas> <!-- 클릭 파동 -->
+    <div id="bubble-layer" class="bubble-layer"></div>
+
+    <!-- 위젯 -->
+    <div class="widget widget-done">
+      <div class="widget-title">🏆 오늘의 완료</div>
+      <div class="widget-body"><span id="done-count" class="done-num">0</span><span class="done-label">개 팡!</span></div>
+    </div>
+
+    <!-- 상단 바 -->
+    <div class="bubble-topbar">
+      <button id="btn-back-room" class="glass-btn">🚪 방으로</button>
+      <button id="btn-add" class="glass-btn primary">🫧 할일 추가</button>
+    </div>
+  </section>
+
+  <!-- ================= 컴퓨터 화면 ================= -->
+  <section id="screen-computer" class="screen">
+    <div id="desktop" class="desktop wp-0">
+      <!-- 데스크톱 아이콘 -->
+      <div class="desk-icons">
+        <button class="desk-icon" data-app="diary"><canvas class="di-canvas" width="16" height="16" data-icon="diary"></canvas><span>다이어리</span></button>
+        <button class="desk-icon" data-app="paint"><canvas class="di-canvas" width="16" height="16" data-icon="paint"></canvas><span>그림판</span></button>
+        <button class="desk-icon" data-app="timer"><canvas class="di-canvas" width="16" height="16" data-icon="timer"></canvas><span>타이머</span></button>
+        <button class="desk-icon" data-app="arcade"><canvas class="di-canvas" width="16" height="16" data-icon="arcade"></canvas><span>아케이드</span></button>
+        <button class="desk-icon" data-app="settings"><canvas class="di-canvas" width="16" height="16" data-icon="settings"></canvas><span>설정</span></button>
+        <button class="desk-icon" data-app="exit"><canvas class="di-canvas" width="16" height="16" data-icon="exit"></canvas><span>방으로 나가기</span></button>
+      </div>
+
+      <!-- 앱 창들 -->
+      <div id="win-diary" class="os-win hidden" style="width:420px">
+        <div class="os-title"><span>📔 나의 다이어리</span><button class="os-x" data-close="diary">✕</button></div>
+        <div class="os-body">
+          <div class="diary-date" id="diary-date">2000. 01. 01.</div>
+          <div class="mood-label">오늘의 기분</div>
+          <div class="mood-row" id="mood-row">
+            <button class="mood-btn" data-mood="🥰" title="행복">🥰</button>
+            <button class="mood-btn" data-mood="😊" title="좋음">😊</button>
+            <button class="mood-btn" data-mood="😐" title="보통">😐</button>
+            <button class="mood-btn" data-mood="😔" title="울적">😔</button>
+            <button class="mood-btn" data-mood="😢" title="슬픔">😢</button>
+            <button class="mood-btn" data-mood="😡" title="화남">😡</button>
+            <button class="mood-btn" data-mood="😴" title="피곤">😴</button>
+          </div>
+          <textarea id="diary-text" class="diary-text" placeholder="오늘 하루 어땠어?"></textarea>
+          <div class="os-actions">
+            <button id="diary-save" class="os-btn ok">저장</button>
+            <button id="diary-comment" class="os-btn">🐟 친구 코멘트</button>
+            <span id="diary-status" class="diary-status"></span>
+          </div>
+          <div id="diary-reply" class="diary-reply hidden"><span class="dr-face">🐟</span><span class="dr-text" id="diary-reply-text"></span></div>
+          <div class="diary-list-head">
+            <span class="diary-list-title">지난 기록</span>
+            <div id="diary-trash" class="diary-trash" title="여기로 드래그해서 삭제">🗑️ <span>드래그해서 삭제</span></div>
+          </div>
+          <div id="diary-list" class="diary-list"></div>
+        </div>
+      </div>
+
+      <div id="win-paint" class="os-win hidden" style="width:376px">
+        <div class="os-title"><span>🎨 그림판</span><button class="os-x" data-close="paint">✕</button></div>
+        <div class="os-body paint-body">
+          <div class="paint-tools">
+            <div class="paint-colors" id="paint-colors"></div>
+            <div class="paint-opts">
+              <div class="paint-sizes" id="paint-sizes">
+                <button class="pt-size" data-size="2">가늘게</button>
+                <button class="pt-size on" data-size="5">보통</button>
+                <button class="pt-size" data-size="11">굵게</button>
+              </div>
+              <button id="paint-eraser" class="os-btn">🧽 지우개</button>
+              <button id="paint-clear" class="os-btn">🗑️ 전체</button>
+              <button id="paint-save" class="os-btn ok">💾 저장</button>
+            </div>
+          </div>
+          <canvas id="paint-canvas" width="344" height="220"></canvas>
+        </div>
+      </div>
+
+      <div id="win-timer" class="os-win hidden" style="width:330px">
+        <div class="os-title"><span>⏱️ 타이머</span><button class="os-x" data-close="timer">✕</button></div>
+        <div class="os-body timer-body">
+          <div class="timer-tabs">
+            <button class="tm-tab on" data-mode="normal">⏳ 일반 타이머</button>
+            <button class="tm-tab" data-mode="study">🔥 열공 타이머</button>
+          </div>
+          <!-- 일반 타이머 -->
+          <div id="tm-normal" class="tm-panel">
+            <div class="tm-setup" id="tm-setup">
+              <div class="tm-adj"><button class="tm-btn" data-h="-1">−</button><b id="tm-h">0</b><span>시간</span><button class="tm-btn" data-h="1">＋</button></div>
+              <div class="tm-adj"><button class="tm-btn" data-m="-5">−</button><b id="tm-m">10</b><span>분</span><button class="tm-btn" data-m="5">＋</button></div>
+            </div>
+            <div class="tm-hint">최대 5시간까지 설정할 수 있어요</div>
+            <div class="tm-display" id="tm-normal-disp">00:10:00</div>
+            <div class="tm-bell"><span>🔔 벨소리</span><div class="tm-bell-opts" id="tm-bell-opts"></div></div>
+            <div class="tm-ctrls">
+              <button id="tm-start" class="os-btn ok">▶ 시작</button>
+              <button id="tm-stop" class="os-btn">⏸ 멈춤</button>
+              <button id="tm-reset" class="os-btn">↺ 초기화</button>
+            </div>
+          </div>
+          <!-- 열공 타이머 -->
+          <div id="tm-study" class="tm-panel hidden">
+            <div class="tm-hint">시작을 누르면 공부 시간을 재요. 멈추면 오늘 기록에 저장돼요!</div>
+            <div class="tm-display study" id="tm-study-disp">00:00:00</div>
+            <div class="tm-ctrls">
+              <button id="tm-study-start" class="os-btn ok">▶ 시작</button>
+              <button id="tm-study-stop" class="os-btn">⏹ 멈춤</button>
+            </div>
+            <div class="tm-records">
+              <div class="tm-rec-title">📚 오늘의 열공 기록</div>
+              <div class="tm-rec-row">🏆 최고 <b id="tm-rec-best">기록 없음</b></div>
+              <div class="tm-rec-row">🐢 최소 <b id="tm-rec-min">기록 없음</b></div>
+              <div class="tm-rec-row">⏰ 총 공부 <b id="tm-rec-total">0분</b> <span id="tm-rec-cnt" class="tm-rec-cnt"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="win-settings" class="os-win hidden" style="width:380px">
+        <div class="os-title"><span>⚙️ 설정</span><button class="os-x" data-close="settings">✕</button></div>
+        <div class="os-body">
+          <div class="set-row">
+            <label>효과음</label>
+            <div class="seg" id="set-sfx">
+              <button data-v="on">켜기</button><button data-v="off">끄기</button>
+            </div>
+          </div>
+          <div class="set-row">
+            <label>노래</label>
+            <div class="seg" id="set-music">
+              <button data-v="on">켜기</button><button data-v="off">끄기</button>
+            </div>
+          </div>
+          <div class="set-row">
+            <label>글씨 크기</label>
+            <div class="seg" id="set-font">
+              <button data-v="s">작게</button><button data-v="m">보통</button><button data-v="l">크게</button>
+            </div>
+          </div>
+          <div class="set-row">
+            <label>바탕화면</label>
+            <div class="seg wp-seg" id="set-wp">
+              <button data-v="0">에어로</button><button data-v="1">선셋</button><button data-v="2">딥씨</button>
+            </div>
+          </div>
+          <div class="set-row">
+            <label>밝기</label>
+            <div class="seg" id="set-bright">
+              <button data-v="d">어둡게</button><button data-v="m">보통</button><button data-v="b">밝게</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="win-arcade" class="os-win hidden" style="width:300px">
+        <div class="os-title"><span>🕹️ 아케이드</span><button class="os-x" data-close="arcade">✕</button></div>
+        <div class="os-body arcade-body">
+          <div id="arcade-list" class="arcade-list"></div>
+          <div id="arcade-game" class="arcade-game hidden">
+            <div class="arcade-hud">🍎 <span id="arcade-score">0</span> <span class="ah-best">· 최고 <span id="arcade-best">0</span></span></div>
+            <div class="arcade-stage">
+              <canvas id="arcade-canvas" width="240" height="240"></canvas>
+              <div id="arcade-over" class="arcade-over hidden"><div class="ao-title">게임 오버!</div><div id="arcade-over-score" class="ao-score"></div><button id="arcade-retry" class="os-btn ok">다시하기</button></div>
+            </div>
+            <div class="arcade-ctrls">
+              <button id="arcade-back" class="os-btn">← 목록</button>
+              <div class="dpad">
+                <button class="dp-btn" data-dir="up">▲</button>
+                <div class="dp-mid"><button class="dp-btn" data-dir="left">◀</button><button class="dp-btn" data-dir="right">▶</button></div>
+                <button class="dp-btn" data-dir="down">▼</button>
+              </div>
+            </div>
+            <div class="arcade-hint">방향키 / WASD 또는 아래 버튼으로 조작</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 작업표시줄 -->
+      <div class="os-taskbar">
+        <button class="os-start" id="os-start">🪟 시작</button>
+        <div class="os-tray"><span id="os-clock">00:00</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 방울 추가/수정 모달 -->
+  <div id="modal" class="modal-overlay hidden">
+    <div class="win98">
+      <div class="win98-title"><span id="modal-title-text">🫧 새 할일</span><button id="modal-close" class="win98-x">✕</button></div>
+      <div class="win98-body">
+        <label class="field-label">할 일</label>
+        <input id="task-input" class="win98-input" type="text" maxlength="60" placeholder="예: 우유 사기" />
+        <label class="field-label">중요도 (방울 크기)</label>
+        <div class="importance-row" id="importance-row">
+          <button class="imp-btn" data-imp="1">사소</button>
+          <button class="imp-btn" data-imp="2">보통</button>
+          <button class="imp-btn imp-selected" data-imp="3">중요</button>
+          <button class="imp-btn" data-imp="4">매우 중요</button>
+          <button class="imp-btn" data-imp="5">긴급!</button>
+        </div>
+        <div class="win98-actions">
+          <button id="modal-ok" class="win98-btn ok">확인</button>
+          <button id="modal-cancel" class="win98-btn">취소</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 사용 설명서 (방마다 내용 다름) -->
+  <div id="guide" class="guide-overlay hidden">
+    <div class="guide-card">
+      <div class="guide-head"><span id="guide-title">🫧 사용 설명서</span> <button class="guide-x" id="guide-x">✕</button></div>
+      <ul class="guide-list" id="guide-list"></ul>
+    </div>
+  </div>
+
+  <!-- 음식 추천 팝업 -->
+  <div id="food-pop" class="food-pop hidden">
+    <div class="food-card">
+      <div class="food-head">🍽️ 오늘 뭐 먹지? <button class="food-x" id="food-close">✕</button></div>
+      <div class="food-tabs" id="food-tabs">
+        <button class="on" data-c="all">전체</button>
+        <button data-c="korean">한식</button>
+        <button data-c="japanese">일식</button>
+        <button data-c="chinese">중식</button>
+        <button data-c="western">양식</button>
+      </div>
+      <div class="food-body">
+        <canvas id="food-canvas" width="32" height="32" class="food-canvas"></canvas>
+        <div class="food-info">
+          <div id="food-name" class="food-name">오늘은 '...' 어때요?</div>
+          <div id="food-cuisine" class="food-cuisine"></div>
+        </div>
+      </div>
+      <button id="food-again" class="food-again">🎲 다시 추천하기</button>
+    </div>
+  </div>
+
+  <!-- 라디오 패널 -->
+  <div id="radio-pop" class="radio-pop hidden">
+    <div class="radio-card">
+      <div class="radio-head">📻 라디오 <button class="radio-x" id="radio-close">✕</button></div>
+      <div id="radio-list" class="radio-list"></div>
+      <button id="radio-stop" class="radio-stop">⏹ 끄기</button>
+      <div class="radio-hint">🎵 곡을 고르면 음악이 흘러요 (모든 방에서 들리고 거실이 가장 크게)</div>
+    </div>
+  </div>
+
+  <!-- 책 추천 팝업 (진짜 책처럼) -->
+  <div id="book-pop" class="book-pop hidden">
+    <div class="book3d" id="book3d">
+      <button class="book-x" id="book-close">✕</button>
+      <!-- 닫힌 책 -->
+      <div class="book-closed" id="book-closed">
+        <div class="bc-spine"></div>
+        <div class="bc-band"></div>
+        <div class="bc-title">문장의 정원</div>
+        <div class="bc-hint">📖 표지를 눌러 펼치기</div>
+      </div>
+      <!-- 펼친 책 -->
+      <div class="book-open" id="book-open">
+        <div class="page page-left">
+          <div class="pl-emoji">📖</div>
+          <div class="pl-title" id="book-title"></div>
+          <div class="pl-author" id="book-author"></div>
+        </div>
+        <div class="page page-right">
+          <div class="pr-quote" id="book-quote"></div>
+        </div>
+        <div class="page-turn" id="page-turn">
+          <div class="pt-face pt-front"><div class="pt-quote" id="pt-quote"></div></div>
+          <div class="pt-face pt-back"></div>
+        </div>
+      </div>
+      <div class="book-controls" id="book-controls">
+        <button id="book-again">📄 다음 책 넘기기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 곰돌이 점집 UI (공원 곰돌이 클릭 → 화면 확대 위에 표시) -->
+  <div id="bfort-ui" class="bfort-ui hidden">
+    <div id="bfort-say" class="bfort-say"></div>
+    <div class="bfort-btns">
+      <button id="bfort-buy" class="bfort-buy">🪙 10코인 · 점 보기</button>
+      <button id="bfort-close" class="bfort-close">닫기</button>
+    </div>
+  </div>
+
+  <!-- 첫 방문 환영/사용법 창 -->
+  <div id="welcome-overlay" class="welcome-overlay hidden">
+    <div class="welcome-bubbles" id="welcome-bubbles"></div>
+    <div class="welcome-card">
+      <div class="welcome-head">
+        <div class="welcome-logo">🫧</div>
+        <h1 class="welcome-title">버블랜드</h1>
+        <p class="welcome-sub">환영해요! 각 공간에서 이런 걸 할 수 있어요 ✨</p>
+      </div>
+      <div class="welcome-grid">
+        <div class="wc-item"><span class="wc-emoji">🛏️</span><div><b>방</b><span>어항을 누르면 할일을 적을 수 있고, 방울을 터뜨려 완료하면 <b>코인</b>과 물고기가 늘어나요. 컴퓨터로는 다이어리·그림판·게임도 즐길 수 있답니다.</span></div></div>
+        <div class="wc-item"><span class="wc-emoji">🛋️</span><div><b>거실</b><span>TV로 화면을 바꾸고 <b>라디오</b>로 음악을 틀어요. 책장을 누르면 좋은 문장을 추천해주고, 소파와 러그도 옮길 수 있어요.</span></div></div>
+        <div class="wc-item"><span class="wc-emoji">🍳</span><div><b>부엌</b><span>냉장고를 열면 <b>오늘 뭐 먹을지</b> 추천해주고, 전자레인지·가스레인지·개수대도 하나씩 눌러볼 수 있어요.</span></div></div>
+        <div class="wc-item"><span class="wc-emoji">🌳</span><div><b>공원</b><span>길고양이를 쓰다듬고 연못의 오리와 놀아요. 밤이 되면 <b>반딧불이</b>가 반짝반짝 날아다녀요.</span></div></div>
+        <div class="wc-item"><span class="wc-emoji">🏪</span><div><b>상점</b><span>모아둔 코인으로 꾸미기 아이템과 <b>스킨</b>을 살 수 있어요. 단, 밤 10시가 지나면 문을 닫는답니다!</span></div></div>
+        <div class="wc-item"><span class="wc-emoji">🌤️</span><div><b>부가기능</b><span>시간과 날씨가 실시간으로 바뀌고(눈이 오면 겨울이 돼요!), 음악·설정·<b>아케이드 게임</b>까지 숨어 있어요.</span></div></div>
+      </div>
+      <div class="welcome-btns">
+        <button id="welcome-start" class="welcome-btn">시작하기 🚀</button>
+        <button id="welcome-hide" class="welcome-hide">✔ 다시 보지 않기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 화면 전환 오버레이 -->
+  <div id="transition" class="transition hidden"></div>
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/foods.js"></script>
+<script src="js/books.js"></script>
+<script src="js/sky.js"></script>
+<script src="js/skins.js"></script>
+<script src="js/decor.js"></script>
+<script src="js/decorlayer.js"></script>
+<script src="js/room.js"></script>
+<script src="js/living.js"></script>
+<script src="js/kitchen.js"></script>
+<script src="js/park.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/bubbles.js"></script>
+<script src="js/arcade.js"></script>
+<script src="js/computer.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

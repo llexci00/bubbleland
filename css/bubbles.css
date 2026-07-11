@@ -1,0 +1,68 @@
+/* ============================================================
+   bubbles.css — 어항 속 할일 화면 (광택 에어로)
+   ============================================================ */
+#screen-bubbles {
+  overflow: hidden;
+  background: linear-gradient(180deg, #7ed0f5 0%, #3fa9e6 45%, #1f7fc4 100%);
+}
+
+/* 물속 빛줄기 */
+.water-rays {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.5;
+  background:
+    linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.18) 45%, transparent 50%),
+    linear-gradient(80deg, transparent 60%, rgba(255,255,255,0.14) 66%, transparent 72%),
+    linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.12) 26%, transparent 32%);
+  animation: rayShift 8s ease-in-out infinite alternate;
+}
+@keyframes rayShift { from { transform: translateX(-20px); } to { transform: translateX(20px); } }
+
+.fish-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;
+  image-rendering: pixelated; image-rendering: crisp-edges; }
+.ripple-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
+.bubble-layer { position: absolute; inset: 0; z-index: 5; }
+
+/* ===== 비눗방울 ===== */
+.bubble {
+  position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  text-align: center; cursor: pointer; will-change: transform; padding: 8px;
+  color: #17384f; font-weight: 700; text-shadow: 0 1px 1px rgba(255,255,255,0.85);
+  line-height: 1.15; overflow: hidden; word-break: keep-all; transition: box-shadow 0.2s ease;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 22%),
+    radial-gradient(circle at 68% 74%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 20%),
+    radial-gradient(circle at 50% 50%, var(--tint, rgba(160,220,255,0.55)) 0%, rgba(255,255,255,0.10) 62%, rgba(255,255,255,0.28) 100%);
+  box-shadow: inset 0 0 18px rgba(255,255,255,0.55), inset -6px -8px 20px rgba(120,180,220,0.35), 0 6px 18px rgba(40,90,130,0.25);
+  border: 1px solid rgba(255,255,255,0.55);
+}
+.bubble:hover { box-shadow: inset 0 0 20px rgba(255,255,255,0.7), inset -6px -8px 22px rgba(120,180,220,0.4),
+  0 8px 22px rgba(40,90,130,0.35), 0 0 0 3px rgba(255,255,255,0.35); }
+.bubble .txt { pointer-events: none; max-height: 100%; overflow: hidden; font-size: inherit; }
+.bubble::after { content: ""; position: absolute; top: 14%; left: 20%; width: 26%; height: 20%; border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95), rgba(255,255,255,0)); pointer-events: none; }
+.bubble.pop { animation: pop 0.42s ease-out forwards; pointer-events: none; }
+@keyframes pop { 0% { transform: scale(1); opacity: 1; } 40% { transform: scale(1.25); opacity: 0.9; } 100% { transform: scale(1.7); opacity: 0; } }
+/* 새 방울: transform 을 건드리지 않고 opacity 만 (구석 튐 방지) */
+.bubble.spawn { animation: spawn 0.6s ease-out; }
+@keyframes spawn { from { opacity: 0; } to { opacity: 1; } }
+
+.splash-bit { position: absolute; border-radius: 50%; z-index: 6; pointer-events: none;
+  background: radial-gradient(circle at 35% 30%, #fff, rgba(180,225,255,0.6)); }
+
+/* ===== 위젯 ===== */
+.widget { position: absolute; z-index: 8; border-radius: 14px; padding: 10px 14px; color: #12384f;
+  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(220,240,255,0.42));
+  border: 1px solid rgba(255,255,255,0.8);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 6px 18px rgba(30,70,110,0.22);
+  backdrop-filter: blur(6px); text-shadow: 0 1px 1px rgba(255,255,255,0.7); }
+.widget-done { top: 18px; left: 18px; text-align: center; }
+.widget-title { font-size: calc(12px * var(--font-scale)); font-weight: 700; opacity: 0.9; }
+.widget-body { margin-top: 2px; }
+.done-num { font-size: calc(30px * var(--font-scale)); font-weight: 800; color: #0d6bb0; }
+.done-label { font-size: calc(12px * var(--font-scale)); }
+
+/* ===== 상단 바 ===== */
+.bubble-topbar { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 10;
+  display: flex; align-items: center; gap: 10px; }
+.bubble-hint { margin-left: 6px; font-size: calc(12px * var(--font-scale)); color: #eaf7ff;
+  text-shadow: 0 1px 3px rgba(0,40,80,0.6); }
