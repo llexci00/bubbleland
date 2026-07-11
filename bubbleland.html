@@ -714,6 +714,10 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   font-weight: 800; font-size: 15px; cursor: pointer; line-height: 1; }
 .tm-btn:active { transform: translateY(1px); }
 .tm-hint { display: none; }
+/* 멈춤 버튼 = 빨강 */
+#tm-stop, #tm-study-stop { color: #fff; border-color: #b5341f; text-shadow: 0 1px 1px rgba(90,20,10,0.4);
+  background: linear-gradient(180deg, #ffb3a3 0%, #ef6a4f 48%, #e0492c 52%, #f28f76 100%); }
+#tm-stop:hover, #tm-study-stop:hover { filter: brightness(1.05); }
 .tm-display { font-variant-numeric: tabular-nums; font-weight: 800; letter-spacing: 1px;
   font-size: calc(40px * var(--font-scale)); color: #2b86d8; padding: 6px 0; text-shadow: 0 1px 6px rgba(60,150,230,0.28); transition: color 0.15s ease; }
 .tm-display.study { color: #2b86d8; }
@@ -1023,10 +1027,10 @@ html, body { width: 100%; height: 100%; overflow: hidden;
           <div id="tm-normal" class="tm-panel">
             <div class="tm-setup" id="tm-setup">
               <div class="tm-adj"><button class="tm-btn" data-h="-1">−</button><b id="tm-h">0</b><span>시간</span><button class="tm-btn" data-h="1">＋</button></div>
-              <div class="tm-adj"><button class="tm-btn" data-m="-1">−</button><b id="tm-m">10</b><span>분</span><button class="tm-btn" data-m="1">＋</button></div>
+              <div class="tm-adj"><button class="tm-btn" data-m="-1">−</button><b id="tm-m">0</b><span>분</span><button class="tm-btn" data-m="1">＋</button></div>
             </div>
             <div class="tm-hint">최대 5시간까지 설정할 수 있어요</div>
-            <div class="tm-display" id="tm-normal-disp">00:10:00</div>
+            <div class="tm-display" id="tm-normal-disp">00:00:00</div>
             <div class="tm-bell"><span>🔔 벨소리</span><div class="tm-bell-opts" id="tm-bell-opts"></div></div>
             <div class="tm-ctrls">
               <button id="tm-start" class="os-btn ok">▶ 시작</button>
@@ -6038,7 +6042,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
 
   // ---- 타이머 상태 ----
   let tmReady = false, tmBell = "ding";
-  let tmTotal = 600, tmLeft = 600, tmRun = false, tmIv = null, tmEnd = 0;         // 일반(카운트다운)
+  let tmTotal = 0, tmLeft = 0, tmRun = false, tmIv = null, tmEnd = 0;             // 일반(카운트다운) — 처음엔 0
   let tmStRun = false, tmStIv = null, tmStBase = 0, tmStMs = 0;                    // 열공(스톱워치)
   const TM_MAX = 5 * 3600, TM_KEY = "bubbleland.study";
   const TM_BELLS = [{ id: "ding", name: "딩동" }, { id: "bell", name: "종" }, { id: "beep", name: "삐삐" }, { id: "chime", name: "차임" }];

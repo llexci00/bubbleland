@@ -15,7 +15,7 @@
 
   // ---- 타이머 상태 ----
   let tmReady = false, tmBell = "ding";
-  let tmTotal = 600, tmLeft = 600, tmRun = false, tmIv = null, tmEnd = 0;         // 일반(카운트다운)
+  let tmTotal = 0, tmLeft = 0, tmRun = false, tmIv = null, tmEnd = 0;             // 일반(카운트다운) — 처음엔 0
   let tmStRun = false, tmStIv = null, tmStBase = 0, tmStMs = 0;                    // 열공(스톱워치)
   const TM_MAX = 5 * 3600, TM_KEY = "bubbleland.study";
   const TM_BELLS = [{ id: "ding", name: "딩동" }, { id: "bell", name: "종" }, { id: "beep", name: "삐삐" }, { id: "chime", name: "차임" }];

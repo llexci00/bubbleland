@@ -122,6 +122,10 @@
   font-weight: 800; font-size: 15px; cursor: pointer; line-height: 1; }
 .tm-btn:active { transform: translateY(1px); }
 .tm-hint { display: none; }
+/* 멈춤 버튼 = 빨강 */
+#tm-stop, #tm-study-stop { color: #fff; border-color: #b5341f; text-shadow: 0 1px 1px rgba(90,20,10,0.4);
+  background: linear-gradient(180deg, #ffb3a3 0%, #ef6a4f 48%, #e0492c 52%, #f28f76 100%); }
+#tm-stop:hover, #tm-study-stop:hover { filter: brightness(1.05); }
 .tm-display { font-variant-numeric: tabular-nums; font-weight: 800; letter-spacing: 1px;
   font-size: calc(40px * var(--font-scale)); color: #2b86d8; padding: 6px 0; text-shadow: 0 1px 6px rgba(60,150,230,0.28); transition: color 0.15s ease; }
 .tm-display.study { color: #2b86d8; }
