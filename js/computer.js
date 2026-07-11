@@ -300,9 +300,9 @@
   function stopStudy() {
     if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }   // 항상 인터벌부터 정리 (누수 방지)
     const secs = tmStMs / 1000;
-    if (secs < 1) { tmStRun = false; tmStMs = 0; document.getElementById("tm-study-disp").textContent = "00:00:00"; window.Audio2.click(300); return; }
+    if (secs < 1) { tmStRun = false; tmStMs = 0; document.getElementById("tm-study-disp").textContent = "00:00:00"; return; }   // 멈춤은 무음
     tmStRun = false;
-    saveStudySession(secs); renderStudyRecords(true); window.Audio2.bell("chime");
+    saveStudySession(secs); renderStudyRecords(true);   // 멈춤 시 소리 없음
     tmStMs = 0; const sd2 = document.getElementById("tm-study-disp"); sd2.textContent = "00:00:00"; sd2.classList.remove("paused"); sd2.style.color = "";
   }
   function studyData() {

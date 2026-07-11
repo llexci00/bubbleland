@@ -414,7 +414,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
 
 /* 펼친 책 */
 .book-open { position: absolute; inset: 0; display: flex; opacity: 0; transform: scale(0.92);
-  transform-style: preserve-3d; transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s; pointer-events: none;
+  transform-style: preserve-3d; perspective: 1500px; transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s; pointer-events: none;
   box-shadow: 0 16px 30px rgba(40,20,10,0.4); border-radius: 8px; }
 #book3d.opened .book-open { opacity: 1; transform: scale(1); pointer-events: auto; }
 .page { width: 50%; height: 100%; background: linear-gradient(#fffdf5, #f2e7cd); box-sizing: border-box;
@@ -427,13 +427,16 @@ html, body { width: 100%; height: 100%; overflow: hidden;
 .pr-quote { font-size: calc(16px * var(--font-scale)); line-height: 1.7; color: #46381f; font-weight: 600; }
 .page-turn { position: absolute; top: 0; right: 0; width: 50%; height: 100%; transform-origin: left center;
   transform-style: preserve-3d; transform: rotateY(0deg); opacity: 0; pointer-events: none; z-index: 3; }
-.pt-face { position: absolute; inset: 0; backface-visibility: hidden; box-sizing: border-box; padding: 26px;
+.pt-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-sizing: border-box; padding: 26px;
   display: flex; align-items: center; justify-content: center; text-align: center; word-break: keep-all; }
 .pt-front { background: linear-gradient(105deg, #f2e7cd, #fffdf5); box-shadow: inset 12px 0 20px rgba(150,120,80,0.18); border-radius: 2px 8px 8px 2px; }
 .pt-back { background: linear-gradient(255deg, #eaddbf, #f6ecd4); transform: rotateY(180deg); box-shadow: inset -12px 0 20px rgba(150,120,80,0.22); border-radius: 8px 2px 2px 8px; }
 .pt-quote { font-size: calc(16px * var(--font-scale)); line-height: 1.7; color: #46381f; font-weight: 600; }
 .page-turn.flip { animation: pageFlipAnim 0.72s ease-in-out; }
 @keyframes pageFlipAnim { 0% { opacity: 1; transform: rotateY(0deg); } 99% { opacity: 1; } 100% { opacity: 0; transform: rotateY(-180deg); } }
+/* 앞면 글자는 페이지가 옆면(절반)을 지나면 사라지게 → 뒤집힌 글자 안 보임 */
+.page-turn.flip .pt-front { animation: ptFrontFade 0.72s ease-in-out; }
+@keyframes ptFrontFade { 0%, 46% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
 .book-controls { position: absolute; bottom: -50px; left: 0; right: 0; text-align: center; opacity: 0; transition: opacity 0.3s ease 0.3s; }
 #book3d.opened .book-controls { opacity: 1; }
@@ -4504,7 +4507,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
     canopy.forEach((c) => { ctx.fillStyle = leafL; ctx.beginPath(); ctx.arc(c[0] - c[2] * 0.35, c[1] - c[2] * 0.4, c[2] * 0.5, 0, 7); ctx.fill(); }); // 하이라이트
     // 결정적 잎 텍스처 (각도 시드는 sway와 무관 → 흔들려도 잎에 붙어 함께 이동, 안 튐)
     canopy.forEach((c, ci) => { for (let k = 0; k < 4; k++) { const a = k * 1.9 + ci * 1.3 + tx; P(c[0] + Math.cos(a) * c[2] * 0.5, c[1] + Math.sin(a) * c[2] * 0.5, 1, 1, leafD); } });
-    if (weather === "sunny" || weather === "rainbow") for (let i = 0; i < s * 0.4; i++) { const a = i * 2.4, rr = s * 0.2 + (i % 5) * s * 0.08; P(tx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.8, 2, 2, i % 2 ? "#ffb3cd" : "#ff9ab8"); }
+    if (weather === "rainbow") for (let i = 0; i < s * 0.4; i++) { const a = i * 2.4, rr = s * 0.2 + (i % 5) * s * 0.08; P(tx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.8, 2, 2, i % 2 ? "#ffb3cd" : "#ff9ab8"); }   // 무지개일 때만 나무에 꽃
   }
 
   // ============================================================
@@ -4944,11 +4947,11 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   // ============================================================
   //  파티클/하트
   // ============================================================
-  function seedPetals() { petals = []; if (weather === "sunny" || weather === "rainbow") for (let i = 0; i < 18; i++) petals.push({ x: rnd(W), y: rnd(H), vy: 0.3 + rnd(0.5), sw: rnd(6.28) }); }
+  function seedPetals() { petals = []; if (weather === "rainbow") for (let i = 0; i < 18; i++) petals.push({ x: rnd(W), y: rnd(H), vy: 0.3 + rnd(0.5), sw: rnd(6.28) }); }   // 무지개일 때만 꽃잎
   function seedFlowers() { flowers = []; const cols = ["#ff7aa0", "#ffd23f", "#ff9ab8", "#c98ae0", "#ffffff"]; for (let i = 0; i < 26; i++) { const x = rnd(W), y = HZ + 22 + rnd(H - HZ - 26); if (Math.abs(x - pathCx((y - HZ) / (H - HZ))) < 24) continue; flowers.push({ x, y, c: cols[i % cols.length] }); } }
   function drawFlowers() { for (const f of flowers) { P(f.x, f.y, 1, 2, "#4a8a2e"); P(f.x - 1, f.y - 2, 3, 2, f.c); P(f.x, f.y - 1, 1, 1, "#ffe680"); } }
   function drawWeatherFx() {
-    if (weather === "sunny" || weather === "rainbow") { for (const p of petals) { p.y += p.vy; p.sw += 0.05; p.x += Math.sin(p.sw) * 0.4; if (p.y > H) { p.y = -4; p.x = rnd(W); } P(p.x, p.y, 2, 2, "#ffc0d8"); } }
+    if (weather === "rainbow") { for (const p of petals) { p.y += p.vy; p.sw += 0.05; p.x += Math.sin(p.sw) * 0.4; if (p.y > H) { p.y = -4; p.x = rnd(W); } P(p.x, p.y, 2, 2, "#ffc0d8"); } }
     else if (weather === "rain") { ctx.strokeStyle = "rgba(200,225,245,0.6)"; ctx.lineWidth = 1; for (let i = 0; i < 44; i++) { const x = (i * 37 - t * 4) % W, y = (i * 53 + t * 8) % H; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 2, y + 6); ctx.stroke(); } }
     else if (weather === "snow") { ctx.fillStyle = "#fff"; for (let i = 0; i < 36; i++) { const x = (i * 29 + Math.sin((t + i * 8) * 0.05) * 6) % W, y = (i * 41 + t * 1.4) % H; P(x, y, 2, 2, "#fff"); } }
   }
@@ -6280,9 +6283,9 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   function stopStudy() {
     if (tmStIv) { clearInterval(tmStIv); tmStIv = null; }   // 항상 인터벌부터 정리 (누수 방지)
     const secs = tmStMs / 1000;
-    if (secs < 1) { tmStRun = false; tmStMs = 0; document.getElementById("tm-study-disp").textContent = "00:00:00"; window.Audio2.click(300); return; }
+    if (secs < 1) { tmStRun = false; tmStMs = 0; document.getElementById("tm-study-disp").textContent = "00:00:00"; return; }   // 멈춤은 무음
     tmStRun = false;
-    saveStudySession(secs); renderStudyRecords(true); window.Audio2.bell("chime");
+    saveStudySession(secs); renderStudyRecords(true);   // 멈춤 시 소리 없음
     tmStMs = 0; const sd2 = document.getElementById("tm-study-disp"); sd2.textContent = "00:00:00"; sd2.classList.remove("paused"); sd2.style.color = "";
   }
   function studyData() {

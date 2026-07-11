@@ -252,7 +252,7 @@
 
 /* 펼친 책 */
 .book-open { position: absolute; inset: 0; display: flex; opacity: 0; transform: scale(0.92);
-  transform-style: preserve-3d; transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s; pointer-events: none;
+  transform-style: preserve-3d; perspective: 1500px; transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s; pointer-events: none;
   box-shadow: 0 16px 30px rgba(40,20,10,0.4); border-radius: 8px; }
 #book3d.opened .book-open { opacity: 1; transform: scale(1); pointer-events: auto; }
 .page { width: 50%; height: 100%; background: linear-gradient(#fffdf5, #f2e7cd); box-sizing: border-box;
@@ -265,13 +265,16 @@
 .pr-quote { font-size: calc(16px * var(--font-scale)); line-height: 1.7; color: #46381f; font-weight: 600; }
 .page-turn { position: absolute; top: 0; right: 0; width: 50%; height: 100%; transform-origin: left center;
   transform-style: preserve-3d; transform: rotateY(0deg); opacity: 0; pointer-events: none; z-index: 3; }
-.pt-face { position: absolute; inset: 0; backface-visibility: hidden; box-sizing: border-box; padding: 26px;
+.pt-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-sizing: border-box; padding: 26px;
   display: flex; align-items: center; justify-content: center; text-align: center; word-break: keep-all; }
 .pt-front { background: linear-gradient(105deg, #f2e7cd, #fffdf5); box-shadow: inset 12px 0 20px rgba(150,120,80,0.18); border-radius: 2px 8px 8px 2px; }
 .pt-back { background: linear-gradient(255deg, #eaddbf, #f6ecd4); transform: rotateY(180deg); box-shadow: inset -12px 0 20px rgba(150,120,80,0.22); border-radius: 8px 2px 2px 8px; }
 .pt-quote { font-size: calc(16px * var(--font-scale)); line-height: 1.7; color: #46381f; font-weight: 600; }
 .page-turn.flip { animation: pageFlipAnim 0.72s ease-in-out; }
 @keyframes pageFlipAnim { 0% { opacity: 1; transform: rotateY(0deg); } 99% { opacity: 1; } 100% { opacity: 0; transform: rotateY(-180deg); } }
+/* 앞면 글자는 페이지가 옆면(절반)을 지나면 사라지게 → 뒤집힌 글자 안 보임 */
+.page-turn.flip .pt-front { animation: ptFrontFade 0.72s ease-in-out; }
+@keyframes ptFrontFade { 0%, 46% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
 .book-controls { position: absolute; bottom: -50px; left: 0; right: 0; text-align: center; opacity: 0; transition: opacity 0.3s ease 0.3s; }
 #book3d.opened .book-controls { opacity: 1; }

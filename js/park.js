@@ -240,7 +240,7 @@
     canopy.forEach((c) => { ctx.fillStyle = leafL; ctx.beginPath(); ctx.arc(c[0] - c[2] * 0.35, c[1] - c[2] * 0.4, c[2] * 0.5, 0, 7); ctx.fill(); }); // 하이라이트
     // 결정적 잎 텍스처 (각도 시드는 sway와 무관 → 흔들려도 잎에 붙어 함께 이동, 안 튐)
     canopy.forEach((c, ci) => { for (let k = 0; k < 4; k++) { const a = k * 1.9 + ci * 1.3 + tx; P(c[0] + Math.cos(a) * c[2] * 0.5, c[1] + Math.sin(a) * c[2] * 0.5, 1, 1, leafD); } });
-    if (weather === "sunny" || weather === "rainbow") for (let i = 0; i < s * 0.4; i++) { const a = i * 2.4, rr = s * 0.2 + (i % 5) * s * 0.08; P(tx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.8, 2, 2, i % 2 ? "#ffb3cd" : "#ff9ab8"); }
+    if (weather === "rainbow") for (let i = 0; i < s * 0.4; i++) { const a = i * 2.4, rr = s * 0.2 + (i % 5) * s * 0.08; P(tx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.8, 2, 2, i % 2 ? "#ffb3cd" : "#ff9ab8"); }   // 무지개일 때만 나무에 꽃
   }
 
   // ============================================================
@@ -680,11 +680,11 @@
   // ============================================================
   //  파티클/하트
   // ============================================================
-  function seedPetals() { petals = []; if (weather === "sunny" || weather === "rainbow") for (let i = 0; i < 18; i++) petals.push({ x: rnd(W), y: rnd(H), vy: 0.3 + rnd(0.5), sw: rnd(6.28) }); }
+  function seedPetals() { petals = []; if (weather === "rainbow") for (let i = 0; i < 18; i++) petals.push({ x: rnd(W), y: rnd(H), vy: 0.3 + rnd(0.5), sw: rnd(6.28) }); }   // 무지개일 때만 꽃잎
   function seedFlowers() { flowers = []; const cols = ["#ff7aa0", "#ffd23f", "#ff9ab8", "#c98ae0", "#ffffff"]; for (let i = 0; i < 26; i++) { const x = rnd(W), y = HZ + 22 + rnd(H - HZ - 26); if (Math.abs(x - pathCx((y - HZ) / (H - HZ))) < 24) continue; flowers.push({ x, y, c: cols[i % cols.length] }); } }
   function drawFlowers() { for (const f of flowers) { P(f.x, f.y, 1, 2, "#4a8a2e"); P(f.x - 1, f.y - 2, 3, 2, f.c); P(f.x, f.y - 1, 1, 1, "#ffe680"); } }
   function drawWeatherFx() {
-    if (weather === "sunny" || weather === "rainbow") { for (const p of petals) { p.y += p.vy; p.sw += 0.05; p.x += Math.sin(p.sw) * 0.4; if (p.y > H) { p.y = -4; p.x = rnd(W); } P(p.x, p.y, 2, 2, "#ffc0d8"); } }
+    if (weather === "rainbow") { for (const p of petals) { p.y += p.vy; p.sw += 0.05; p.x += Math.sin(p.sw) * 0.4; if (p.y > H) { p.y = -4; p.x = rnd(W); } P(p.x, p.y, 2, 2, "#ffc0d8"); } }
     else if (weather === "rain") { ctx.strokeStyle = "rgba(200,225,245,0.6)"; ctx.lineWidth = 1; for (let i = 0; i < 44; i++) { const x = (i * 37 - t * 4) % W, y = (i * 53 + t * 8) % H; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 2, y + 6); ctx.stroke(); } }
     else if (weather === "snow") { ctx.fillStyle = "#fff"; for (let i = 0; i < 36; i++) { const x = (i * 29 + Math.sin((t + i * 8) * 0.05) * 6) % W, y = (i * 41 + t * 1.4) % H; P(x, y, 2, 2, "#fff"); } }
   }
