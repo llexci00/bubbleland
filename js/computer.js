@@ -43,11 +43,10 @@
     { body: "#f4a24a", line: "#cf7f2a", nose: "#3a2b2b",   // 호랑이
       back: '<circle cx="18" cy="36" r="7" fill="#f4a24a" stroke="#cf7f2a" stroke-width="1.6"/><circle cx="46" cy="36" r="7" fill="#f4a24a" stroke="#cf7f2a" stroke-width="1.6"/><circle cx="18" cy="36" r="3" fill="#3a2b2b"/><circle cx="46" cy="36" r="3" fill="#3a2b2b"/>',
       extra: '<ellipse cx="32" cy="59" rx="10" ry="6.5" fill="#fff"/><path d="M14 51 l6 1.5 M14 56 l6 0.5 M50 51 l-6 1.5 M50 56 l-6 0.5" stroke="#3a2b2b" stroke-width="1.6" stroke-linecap="round" fill="none"/>' },
-    { body: "#f0d9a8", line: "#d4b57a", nose: "#c08a6a",   // 햄스터 (볼따구는 얼굴 뒤 → 바깥 테두리만)
-      back: '<circle cx="20" cy="37" r="5.5" fill="#f0d9a8" stroke="#d4b57a" stroke-width="1.5"/><circle cx="44" cy="37" r="5.5" fill="#f0d9a8" stroke="#d4b57a" stroke-width="1.5"/><circle cx="20" cy="37" r="2.4" fill="#e6b8c0"/><circle cx="44" cy="37" r="2.4" fill="#e6b8c0"/><circle cx="12" cy="57" r="8.5" fill="#f0d9a8" stroke="#d4b57a" stroke-width="1.5"/><circle cx="52" cy="57" r="8.5" fill="#f0d9a8" stroke="#d4b57a" stroke-width="1.5"/>',
+    { body: "#f0d9a8", line: "#d4b57a", nose: "#c08a6a",   // 햄스터 (볼따구 없음)
+      back: '<circle cx="20" cy="37" r="5.5" fill="#f0d9a8" stroke="#d4b57a" stroke-width="1.5"/><circle cx="44" cy="37" r="5.5" fill="#f0d9a8" stroke="#d4b57a" stroke-width="1.5"/><circle cx="20" cy="37" r="2.4" fill="#e6b8c0"/><circle cx="44" cy="37" r="2.4" fill="#e6b8c0"/>',
       extra: '<ellipse cx="32" cy="59" rx="7" ry="5" fill="#fff"/>' },
-    { body: "#86cf6e", line: "#5aa84a", nose: "#3f7a30",   // 거북이 (등껍질은 아래, 머리털 없음)
-      back: '<ellipse cx="32" cy="64" rx="18" ry="10" fill="#e3a95f" stroke="#bb833e" stroke-width="1.6"/><path d="M23 71 h18 M32 62 v11" stroke="#bb833e" stroke-width="1" fill="none" opacity="0.5"/>' },
+    { body: "#86cf6e", line: "#5aa84a", nose: "#3f7a30" },   // 거북이 (초록 얼굴만 · 몸통 제거)
   ];
   function animalSVG(a) {
     const band = '<path d="M50 43 l9 -4 M50 43 l8 5" stroke="#e6e6ee" stroke-width="3" stroke-linecap="round" fill="none"/>' +
